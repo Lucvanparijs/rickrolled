@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>DRINGEND: Bekijk dit nu ⚠️</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #ff2233;
+      --yellow: #ffe600;
+      --bg: #0d0d0d;
+      --card: #161616;
+      --border: #2a2a2a;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; min-height: 100vh;
+      background: var(--bg);
+      color: #fff;
+      font-family: 'Space Mono', monospace;
+      overflow-x: hidden;
+    }
+
+    /* scanline overlay */
+    body::after {
+      content: '';
+      pointer-events: none;
+      position: fixed; inset: 0; z-index: 9999;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 3px,
+        rgba(0,0,0,.18) 3px, rgba(0,0,0,.18) 4px
+      );
+    }
+
+    /* TAPE header */
+    .tape {
+      width: 100%;
+      background: var(--yellow);
+      color: #000;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1rem, 4vw, 1.6rem);
+      letter-spacing: .15em;
+      text-align: center;
+      padding: .45rem 0;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .tape-inner {
+      display: inline-block;
+      animation: marquee 16s linear infinite;
+      white-space: nowrap;
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* main layout */
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2rem 1.2rem 4rem;
+    }
+
+    /* hero */
+    .hero { text-align: center; margin-bottom: 2rem; }
+
+    .hero-label {
+      font-size: .7rem;
+      letter-spacing: .3em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: .6rem;
+      animation: blink 1.1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 13vw, 6.5rem);
+      line-height: .9;
+      letter-spacing: .04em;
+      background: linear-gradient(160deg, #fff 30%, var(--red) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: .5rem;
+    }
+
+    .hero-sub {
+      font-size: .85rem;
+      color: #666;
+      letter-spacing: .05em;
+    }
+
+    /* video card */
+    .video-card {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1.8rem;
+      box-shadow: 0 0 60px rgba(255,34,51,.25);
+    }
+    .video-card::before {
+      content: '● REC';
+      position: absolute;
+      top: 10px; left: 14px;
+      font-size: .65rem;
+      letter-spacing: .2em;
+      color: var(--red);
+      z-index: 3;
+      animation: blink .9s step-end infinite;
+    }
+    .aspect {
+      position: relative;
+      padding-top: 56.25%;
+    }
+    .aspect iframe {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+
+    /* tap overlay for iOS */
+    #tapOverlay {
+      position: absolute; inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.85);
+      cursor: pointer;
+      transition: opacity .3s;
+    }
+    #tapOverlay.hidden { opacity: 0; pointer-events: none; }
+    .tap-icon {
+      font-size: 3.5rem;
+      animation: tapBounce 1s ease-in-out infinite alternate;
+    }
+    @keyframes tapBounce {
+      from { transform: scale(1); }
+      to   { transform: scale(1.15); }
+    }
+    #tapOverlay p {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: .1em;
+      color: var(--yellow);
+      margin-top: .6rem;
+    }
+
+    /* message card */
+    .msg-card {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--card);
+      padding: 1.4rem 1.6rem;
+      margin-bottom: 1.8rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .msg-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--red), var(--yellow), var(--red));
+      background-size: 200%;
+      animation: shine 2s linear infinite;
+    }
+    @keyframes shine {
+      from { background-position: 0%; }
+      to   { background-position: 200%; }
+    }
+
+    .msg-tag {
+      font-size: .6rem;
+      letter-spacing: .3em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: .9rem;
+    }
+
+    .msg-lines { list-style: none; }
+    .msg-lines li {
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+      font-size: .88rem;
+      line-height: 1.6;
+      color: #c8c8c8;
+      padding: .4rem 0;
+      border-bottom: 1px solid #1e1e1e;
+    }
+    .msg-lines li:last-child { border-bottom: none; }
+    .msg-lines li .ico { flex-shrink: 0; font-size: 1.1rem; }
+
+    .punchline {
+      margin-top: 1rem;
+      font-size: .8rem;
+      color: #555;
+      font-style: italic;
+    }
+    .punchline strong { color: var(--yellow); font-style: normal; }
+
+    /* counter */
+    .counter-block {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--card);
+      padding: 1rem 1.4rem;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+    }
+    .counter-label {
+      font-size: .65rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: .2rem;
+    }
+    .counter-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.2rem;
+      line-height: 1;
+      color: var(--yellow);
+      letter-spacing: .05em;
+      min-width: 4ch;
+    }
+    .counter-desc {
+      font-size: .78rem;
+      color: #666;
+      max-width: 220px;
+      line-height: 1.5;
+      text-align: right;
+    }
+
+    /* share */
+    .share-row { text-align: center; }
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      background: var(--red);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: .12em;
+      padding: .7rem 2rem;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      box-shadow: 4px 4px 0 var(--yellow);
+    }
+    .share-btn:hover  { background: #cc0015; }
+    .share-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 var(--yellow); }
+
+    .copied-toast {
+      display: inline-block;
+      margin-top: .8rem;
+      font-size: .75rem;
+      letter-spacing: .2em;
+      color: var(--yellow);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .copied-toast.show { opacity: 1; }
+
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: .65rem;
+      letter-spacing: .2em;
+      color: #2e2e2e;
+      text-transform: uppercase;
+    }
+
+    /* staggered entrance */
+    .page > * {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: slideUp .5s ease forwards;
+    }
+    .page > *:nth-child(1) { animation-delay: .05s; }
+    .page > *:nth-child(2) { animation-delay: .18s; }
+    .page > *:nth-child(3) { animation-delay: .30s; }
+    .page > *:nth-child(4) { animation-delay: .42s; }
+    .page > *:nth-child(5) { animation-delay: .54s; }
+    .page > *:nth-child(6) { animation-delay: .66s; }
+    @keyframes slideUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9997; }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<!-- Ticker tape -->
+<div class="tape">
+  <span class="tape-inner">
+    🎵 NEVER GONNA GIVE YOU UP &nbsp;•&nbsp; NEVER GONNA LET YOU DOWN &nbsp;•&nbsp;
+    NEVER GONNA RUN AROUND AND DESERT YOU &nbsp;•&nbsp; NEVER GONNA MAKE YOU CRY &nbsp;•&nbsp;
+    NEVER GONNA SAY GOODBYE &nbsp;•&nbsp; NEVER GONNA TELL A LIE AND HURT YOU &nbsp;•&nbsp;
+    🎵 NEVER GONNA GIVE YOU UP &nbsp;•&nbsp; NEVER GONNA LET YOU DOWN &nbsp;•&nbsp;
+    NEVER GONNA RUN AROUND AND DESERT YOU &nbsp;•&nbsp; NEVER GONNA MAKE YOU CRY &nbsp;•&nbsp;
+    NEVER GONNA SAY GOODBYE &nbsp;•&nbsp; NEVER GONNA TELL A LIE AND HURT YOU &nbsp;•&nbsp;
+  </span>
+</div>
+
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-label">⚠ Kritieke melding ⚠</div>
+    <h1>GE-RICK-ROLLED</h1>
+    <p class="hero-sub">Ja, jij. Welkom in de club. Lidmaatschap is gratis &amp; onvrijwillig.</p>
+  </div>
+
+  <div class="video-card">
+    <div class="aspect">
+      <div id="tapOverlay">
+        <div class="tap-icon">👆</div>
+        <p>TIK OM TE STARTEN</p>
+      </div>
+      <iframe id="ytFrame"
+        src="about:blank"
+        allow="autoplay; encrypted-media; fullscreen"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+  <div class="msg-card">
+    <div class="msg-tag">// Officieel rapport — incident #1987-RA</div>
+    <ul class="msg-lines">
+      <li><span class="ico">🕵️</span><span>Onze algoritmen hebben gedetecteerd dat jij op <em>letterlijk alles</em> klikt. Respect voor de consistentie.</span></li>
+      <li><span class="ico">🎣</span><span>Deze QR-code werd geplaatst door iemand die van jou houdt... op een zeer kwaadaardige manier.</span></li>
+      <li><span class="ico">🔊</span><span>Jouw gsm speelt nu Rick Astley. Je buren ook. Misschien ook je baas. Succes met uitleggen.</span></li>
+      <li><span class="ico">📋</span><span>Je naam staat nu in het <strong style="color:var(--yellow)">Groot Boek der Gerollden</strong>. Pagina 47, paragraaf 3, voetnoot 12b.</span></li>
+      <li><span class="ico">🏆</span><span>Achievement vrijgespeeld: <strong style="color:var(--yellow)">"QR Naïveling Niveau 99"</strong> — 0,0% van de spelers deed dit niet.</span></li>
+    </ul>
+    <p class="punchline">Onthoud: <strong>Never gonna give you up.</strong> Dat is nu tegelijk een belofte én een dreiging. 🎵</p>
+  </div>
+
+  <div class="counter-block">
+    <div>
+      <div class="counter-label">Totaal gevangen slachtoffers</div>
+      <div class="counter-num" id="cnt">—</div>
+    </div>
+    <div class="counter-desc">
+      Allemaal even nieuwsgierig.<br>Allemaal even naïef.<br>Jij bent er eentje van. 🫵
+    </div>
+  </div>
+
+  <div class="share-row">
+    <button class="share-btn" id="shareBtn">😈 &nbsp;STUUR IEMAND IN DE VAL</button>
+    <br>
+    <span class="copied-toast" id="toast">✔ LINK GEKOPIEERD — VEEL SUCCES</span>
+  </div>
+
+  <footer>© 1987–∞ Rick Astley International — Alle rechten voorbehouden (maar jij niet)</footer>
+
+</div>
+
+<script>
+// ── 1. AUTOPLAY VIDEO ─────────────────────────────────────────────────────
+const YT =
+  'https://www.youtube.com/embed/dQw4w9WgXcQ' +
+  '?autoplay=1&mute=0&rel=0&modestbranding=1&playsinline=1';
+
+const frame      = document.getElementById('ytFrame');
+const tapOverlay = document.getElementById('tapOverlay');
+
+function loadVideo() {
+  frame.src = YT;
+  tapOverlay.classList.add('hidden');
+  // Probeer Web Audio Context te unlocken (helpt op sommige mobiele browsers)
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctx.resume();
+  } catch(e) {}
+}
+
+// Direct laden — als browser autoplay toestaat start het meteen met geluid
+loadVideo();
+
+// iOS Safari overlay fallback
+tapOverlay.addEventListener('click', loadVideo);
+
+// ── 2. GLOBALE TELLER (CounterAPI — gratis, geen account nodig) ──────────
+// CounterAPI telt elke unieke aanroep. Verander NS naar iets unieks voor jou.
+const NS  = 'rickroll-meesterplan-nl-v1';  // ← pas aan indien gewenst
+const CNT = 'slachtoffers';
+
+(async () => {
+  const el = document.getElementById('cnt');
+  try {
+    const r = await fetch(
+      `https://api.counterapi.dev/v1/${NS}/${CNT}/up`,
+      { cache: 'no-store' }
+    );
+    if (!r.ok) throw new Error('API fout');
+    const d = await r.json();
+    const target = d.count ?? 1;
+
+    // Geanimeerde count-up
+    let t0 = null;
+    const dur = 1400;
+    (function tick(ts) {
+      if (!t0) t0 = ts;
+      const p = Math.min((ts - t0) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
+      el.textContent = Math.floor(eased * target).toLocaleString('nl-BE');
+      if (p < 1) requestAnimationFrame(tick);
+      else el.textContent = target.toLocaleString('nl-BE');
+    })(performance.now());
+
+  } catch(e) {
+    // Lokale fallback als API niet bereikbaar is
+    const local = parseInt(localStorage.getItem('rr_visits') || '0', 10) + 1;
+    localStorage.setItem('rr_visits', local);
+    el.textContent = local.toLocaleString('nl-BE');
+  }
+})();
+
+// ── 3. DEEL-KNOP ─────────────────────────────────────────────────────────
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  const url   = location.href;
+  const toast = document.getElementById('toast');
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'DRINGEND: bekijk dit nu 👀',
+        text:  'Iemand heeft me gevraagd dit dringend met jou te delen...',
+        url
+      });
+    } catch(e) {}
+  } else {
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch(e) {
+      // Oudere browser fallback
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+});
+
+// ── 4. CONFETTI (6 seconden) ──────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('confetti');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const COLORS = ['#ff2233','#ffe600','#ffffff','#00c8ff','#ff88cc','#aaff44'];
+  const pieces = Array.from({ length: 90 }, () => ({
+    x:  Math.random() * canvas.width,
+    y:  Math.random() * canvas.height - canvas.height,
+    w:  6  + Math.random() * 8,
+    h:  10 + Math.random() * 6,
+    r:  Math.random() * Math.PI * 2,
+    dr: (Math.random() - .5) * .12,
+    dy: 1.8 + Math.random() * 2.5,
+    dx: (Math.random() - .5) * .9,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    alpha: .7 + Math.random() * .3
+  }));
+
+  let frame = 0;
+  const MAX = 360; // ~6 sec at 60fps
+
+  (function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.r);
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+      p.y += p.dy; p.x += p.dx; p.r += p.dr;
+      if (p.y > canvas.height + 20) {
+        p.y = -20;
+        p.x = Math.random() * canvas.width;
+      }
+    });
+    if (frame++ < MAX) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  })();
+})();
+</script>
+
+</body>
+</html>
